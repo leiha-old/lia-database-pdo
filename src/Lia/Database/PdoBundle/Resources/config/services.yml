@@ -2,6 +2,7 @@ parameters:
     lia.factory.database.pdo.class: Lia\Database\PdoBundle\DependencyInjection\Factory
 
 services:
-    lia.factory.database:
+    lia.factory.database.pdo:
         class: %lia.factory.database.pdo.class%
-        arguments: [@service_container]
+        calls:
+            - ['setContainer', [@service_container]]

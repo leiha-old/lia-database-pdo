@@ -5,7 +5,7 @@ namespace Lia\Database\PdoBundle;
 use Doctrine\DBAL\Connection;
 use Lia\KernelBundle\Cache\DirectoryCache;
 
-class Definition
+class TableDefinition
 {
     /**
      * @var string
@@ -35,11 +35,12 @@ class Definition
     /**
      * @param Pdo $pdo
      * @param string $tableName
+     * @param string $tableAlias
      */
     public function __construct(Pdo $pdo, $tableName){
-        $this->pdo       = $pdo;
-        $this->tableName = $tableName;
-        $this->cache     = $this->pdo->getContainer()->get('lia.factory.cache.directory');
+        $this->pdo        = $pdo;
+        $this->tableName  = $tableName;
+        $this->cache      = $this->pdo->getContainer()->get('lia.factory.cache.directory');
         $this->getMetaData();
     }
 
@@ -90,6 +91,29 @@ class Definition
             }
         }
         return \PDO::PARAM_STR;
+    }
+
+    /**
+     * @param array $values
+     * @return array
+     */
+    public function quoteArray(array $values)
+    {
+        $quoted = array();
+        foreach ($values as $fieldName => $value) {
+            $quoted[$fieldName] = $this->quote($value, $fieldName);
+        }
+        return $quoted;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string|number|bool|null $value
+     * @return mixed
+     */
+    public function quote($fieldName, $value)
+    {
+        return $this->pdo->quote($value, $this->getTypeOf($fieldName));
     }
 
     /**

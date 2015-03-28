@@ -10,10 +10,15 @@ interface UpdateInterface
     /**
      * Add Where Clause to query
      * @param string $where
-     * @param array $params
-     * @return WhereUpdateInterface|UpdateInterface
+     * @return UpdateInterface
      */
-    public function where($where='', array $params = null);
+    public function whereInline($where);
+
+    /**
+     * Return Where Clause Object
+     * @return WhereUpdateInterface
+     */
+    public function where();
 
     /**
      * @param bool $enable
@@ -22,14 +27,15 @@ interface UpdateInterface
     public function enableForceMode($enable=true);
 
     /**
-     * @param string|array $set
-     * @return UpdateInterface
+     * @param string|array $set if an array the shape is :
+     *                          <br /> ['field1'=>'mappedKey1', .etc..] or ['field1', .etc..]
+     * @return Update
      */
     public function set($set);
 
     /**
-     * @param array $set
-     * @return UpdateInterface
+     * @param array $set ['field1'=>'mappedKey1', .etc..] or ['field1', .etc..]
+     * @return Update
      */
     public function setArray(array $set);
 

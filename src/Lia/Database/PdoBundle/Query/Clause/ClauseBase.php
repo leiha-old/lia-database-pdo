@@ -12,6 +12,11 @@ abstract class ClauseBase
     protected $query;
 
     /**
+     * @return string
+     */
+    abstract protected function getSqlClause();
+
+    /**
      * @param string $name
      * @param array $args
      * @return mixed

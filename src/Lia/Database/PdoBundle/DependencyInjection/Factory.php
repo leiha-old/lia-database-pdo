@@ -8,9 +8,9 @@ use Lia\KernelBundle\Service\ServiceBase;
 class Factory
     extends ServiceBase
 {
-    public function get($connectionName)
+    public function getConnection()
     {
-        $pdo = new Pdo($this->getService('doctrine.dbal.'.$connectionName.'_connection'));
+        $pdo = new Pdo($this->getService('doctrine.dbal.connection'));
         $pdo->setContainer($this->container);
         return $pdo;
     }

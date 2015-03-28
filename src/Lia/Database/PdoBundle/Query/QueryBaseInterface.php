@@ -2,6 +2,7 @@
 
 namespace Lia\Database\PdoBundle\Query;
 
+use Lia\Database\PdoBundle\Parser\ParserBase;
 
 interface QueryBaseInterface
 {
@@ -9,41 +10,22 @@ interface QueryBaseInterface
      * @param array $params
      * @return int
      */
-    public function execute(array $params = array());
-
-    /**
-     * @return string
-     */
-    public function getQuery();
-
-    /**
-     * @return array
-     */
-    public function getParams();
+    public function execute(array $params = null);
 
     /**
      * @param array $params
+     * @return string
+     */
+    public function getQuery(array $params = null);
+
+    /**
+     * @return ParserBase
+     */
+    public function getParser();
+
+    /**
+     * @param string $tableName
      * @return $this
      */
-    public function addParams(array $params);
-
-    /**
-     * @param string $fieldName
-     * @param string|number|bool|null $value
-     * @return $this
-     */
-    public function addParam($fieldName, $value);
-
-    /**
-     * @param array $values
-     * @return array
-     */
-    public function quoteArray(array $values);
-
-    /**
-     * @param string $fieldName
-     * @param string|number|bool|null
-     * @return mixed
-     */
-    public function quote($fieldName, $value);
+    public function table($tableName);
 }

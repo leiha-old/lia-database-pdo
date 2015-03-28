@@ -2,9 +2,14 @@
 
 namespace Lia\Database\PdoBundle;
 
+use Lia\Database\PdoBundle\Parser\MultiTableParser;
+use Lia\Database\PdoBundle\Parser\ParserInterface;
+use Lia\Database\PdoBundle\Parser\SimpleParser;
+use Lia\Database\PdoBundle\Parser\TableParser;
 use Lia\Database\PdoBundle\Query\Update;
 use Lia\Database\PdoBundle\Query\UpdateInterface;
 use Doctrine\DBAL\Connection;
+use Lia\Database\PdoBundle\Query\UpdateTableInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Pdo
@@ -72,15 +77,28 @@ class Pdo
     }
 
     /**
-     * @param string $tableName
-     * @param array $set
-     * @param mixed $value
-     * @param string $fieldName
-     * @return UpdateInterface|int
+     * @param ParserInterface $parser
+     * @return UpdateInterface
      */
-    public function update($tableName, array $set = array(), $value = null, $fieldName = null)
+    public function update(ParserInterface $parser=null)
     {
-        $execute = new Update($this, $tableName);
+        $execute = new Update($this, $parser);
+        return $execute;
+    }
+
+    /**
+     * @param string $tableName
+     * @param array  $set
+     * @param mixed  $value
+     * @param string $fieldName
+     * @return UpdateTableInterface|int
+     */
+    public function updateTable($tableName, array $set = array(), $value = null, $fieldName = null)
+    {
+        $parser  = $this->getTableParser($tableName);
+        $execute = $this->update($parser)
+            ->table($tableName)
+        ;
 
         if(count($set)) {
             $execute->setArray($set);
@@ -88,9 +106,15 @@ class Pdo
 
         if(null !== $value) {
             if(null === $fieldName) {
-                $fieldName = $execute->tableDefinition->getPrimaryKey();
+                $fieldName = $parser->getTableDefinition()->getPrimaryKey();
             }
-            $execute = $execute->where->equal($fieldName, $value)->end()->execute();
+
+            $execute = $execute
+                ->where()
+                    ->equal($fieldName, $value)
+                ->end()
+                ->execute()
+            ;
         }
 
         return $execute;
@@ -98,23 +122,59 @@ class Pdo
 
     /**
      * @param string $tableName
-     * @return Definition
+     * @return TableDefinition
      */
     public function getTableDefinition($tableName)
     {
-        return new Definition($this, $tableName);
+        return new TableDefinition($this, $tableName);
     }
 
+    /**
+     * @param string|number|null|bool $value
+     * @param int $dataType
+     * @return string
+     */
     public function quote($value, $dataType = \PDO::PARAM_STR)
     {
         return $this->dbal->quote($value, $dataType);
     }
 
+    /**
+     * @param array $values
+     * @param int $dataType
+     * @return array
+     */
     public function quoteArray(array $values, $dataType = \PDO::PARAM_STR)
     {
         foreach ($values as &$value) {
             $value = $this->quote($value, $dataType);
         }
         return $values;
+    }
+
+    /**
+     * @return SimpleParser
+     */
+    public function getSimpleParser()
+    {
+        return new SimpleParser($this);
+    }
+
+    /**
+     * @param string $tableName
+     * @param string $tableAlias
+     * @return TableParser
+     */
+    public function getTableParser($tableName, $tableAlias='')
+    {
+        return new TableParser($this, $tableName, $tableAlias);
+    }
+
+    /**
+     * @return MultiTableParser
+     */
+    public function getMultiTableParser()
+    {
+        return new MultiTableParser($this);
     }
 }

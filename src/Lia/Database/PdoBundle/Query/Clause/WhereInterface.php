@@ -7,47 +7,45 @@ interface WhereInterface
 {
     /**
      * @param string $where
-     * @param array $params
      * @return $this
      */
-    //public function add($where, array $params = null);
+    public function addInline($where);
 
     /**
      * @param string $field
-     * @param string|bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function superior($field, $value = false, $condition = 'AND');
+    public function superior($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param string|bool $value
      * @return $this
      */
-    public function orSuperior($field, $value = false);
+    public function orSuperior($field);
 
     /**
      * @param string $field
-     * @param string|bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function inferior($field, $value = false, $condition = 'AND');
+    public function inferior($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param string|bool $value
      * @return $this
      */
-    public function orInferior($field, $value = false);
+    public function orInferior($field);
 
     /**
      * @param string $field
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function null($field, $condition = 'AND');
+    public function null($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
@@ -57,10 +55,11 @@ interface WhereInterface
 
     /**
      * @param string $field
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function notNull($field, $condition = 'AND');
+    public function notNull($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
@@ -70,91 +69,85 @@ interface WhereInterface
 
     /**
      * @param string $field
-     * @param array $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function in($field, array $value = array(), $condition = 'AND');
+    public function in($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param array $value
      * @return $this
      */
-    public function orIn($field, array $value = array());
+    public function orIn($field);
 
     /**
      * @param string $field
-     * @param array $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function notIn($field, array $value = array(), $condition = 'AND');
+    public function notIn($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param array $value
      * @return $this
      */
-    public function orNotIn($field, array $value = array());
+    public function orNotIn($field);
 
     /**
      * @param string $field
-     * @param string|bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function equal($field, $value = false, $condition = 'AND');
+    public function equal($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param string|bool $value
      * @return $this
      */
-    public function orEqual($field, $value = false);
+    public function orEqual($field);
 
     /**
      * @param string $field
-     * @param string|bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function notEqual($field, $value = false, $condition = 'AND');
+    public function notEqual($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param string|bool $value
      * @return $this
      */
-    public function orNotEqual($field, $value = false);
+    public function orNotEqual($field);
 
     /**
      * @param string $field
-     * @param string|bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function like($field, $value = false, $condition = 'AND');
+    public function like($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param string|bool $value
      * @return $this
      */
-    public function orLike($field,$value = false);
+    public function orLike($field);
 
     /**
      * @param string $field
-     * @param string|bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return $this
      */
-    public function notLike($field, $value = false, $condition = 'AND');
+    public function notLike($field, $mappedKey=null, $condition = 'AND');
 
     /**
      * @param string $field
-     * @param string|bool $value
      * @return $this
      */
-    public function orNotLike($field, $value = false);
+    public function orNotLike($field);
 }

@@ -2,8 +2,6 @@
 
 namespace Lia\Database\PdoBundle\Query\Clause;
 
-use Doctrine\DBAL\Connection;
-
 class Where
     extends ClauseBase
     implements WhereInterface
@@ -18,6 +16,9 @@ class Where
      */
     protected $whereInline = '';
 
+    /**
+     * @return string
+     */
     protected function getSqlClause()
     {
         return ' WHERE ';
@@ -39,7 +40,7 @@ class Where
         }
 
         if($where){
-            $where = $this->getSqlClause().$this->query->parse($where);
+            $where = $this->getSqlClause().$where;
         }
 
         return $where;
@@ -47,330 +48,254 @@ class Where
 
     /**
      * @param string $where
-     * @param array $params
      * @return $this
      */
-    public function add($where, array $params = null)
+    public function addInline($where)
     {
         if (strlen($this->whereInline)) {
-            $this->whereInline = ' ';
+            $this->whereInline .= ' ';
         }
         $this->whereInline .= $where;
-
-        if(is_array($params)) {
-            $this->query->addParams($params);
-        }
         return $this;
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function superior(
-        $field,
-        $value = false,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, '>');
+    public function superior($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, '>');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orSuperior(
-        $field,
-        $value = false
-    ) {
-        return $this->superior($field, $value, 'OR');
+    public function orSuperior($field, $mappedKey=null)
+    {
+        return $this->superior($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function inferior(
-        $field,
-        $value = false,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, '<');
+    public function inferior($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, '<');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orInferior(
-        $field,
-        $value = false
-    ) {
-        return $this->inferior($field, $value, 'OR');
+    public function orInferior($field, $mappedKey=null)
+    {
+        return $this->inferior($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function null(
-        $field,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, null, $condition, 'IS NULL');
+    public function null($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, 'IS NULL');
     }
 
     /**
      * @param string $field
+     * @param string $mappedKey
      * @return Where
      */
-    public function orNull(
-        $field
-    ) {
-        return $this->null($field, 'OR');
+    public function orNull($field, $mappedKey=null)
+    {
+        return $this->null($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function notNull(
-        $field,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, null, $condition, 'IS NOT NULL');
+    public function notNull($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, 'IS NOT NULL');
     }
 
     /**
      * @param string $field
+     * @param string $mappedKey
      * @return Where
      */
-    public function orNotNull(
-        $field
-    ) {
-        return $this->notNull($field, 'OR');
+    public function orNotNull($field, $mappedKey=null)
+    {
+        return $this->notNull($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param array $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function in(
-        $field,
-        array $value = array(),
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, 'IN');
+    public function in($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, 'IN');
     }
 
     /**
      * @param string $field
-     * @param array $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orIn(
-        $field,
-        array $value = array()
-    ) {
-        return $this->in($field, $value, 'OR');
+    public function orIn($field, $mappedKey=null)
+    {
+        return $this->in($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param array $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function notIn(
-        $field,
-        array $value = array(),
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, 'NOT IN');
+    public function notIn($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, 'NOT IN');
     }
 
     /**
      * @param string $field
-     * @param array $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orNotIn(
-        $field,
-        array $value = array()
-    ) {
-        return $this->notIn($field, $value, 'OR');
+    public function orNotIn($field, $mappedKey=null)
+    {
+        return $this->notIn($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function equal(
-        $field,
-        $value = false,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, '=');
+    public function equal($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, '=');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orEqual(
-        $field,
-        $value = false
-    ) {
-        return $this->equal($field, $value, 'OR');
+    public function orEqual($field, $mappedKey=null)
+    {
+        return $this->equal($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function notEqual(
-        $field,
-        $value = false,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, '!=');
+    public function notEqual($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, '!=');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orNotEqual(
-        $field,
-        $value = false
-    ) {
-        return $this->notEqual($field, $value, 'OR');
+    public function orNotEqual($field, $mappedKey=null)
+    {
+        return $this->notEqual($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function like(
-        $field,
-        $value = false,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, 'LIKE');
+    public function like($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, 'LIKE');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orLike(
-        $field,
-        $value = false
-    ) {
-        return $this->like($field, $value, 'OR');
+    public function orLike($field, $mappedKey=null)
+    {
+        return $this->like($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @return Where
      */
-    public function notLike(
-        $field,
-        $value = false,
-        $condition = 'AND'
-    ) {
-        return $this->_add($field, $value, $condition, 'NOT LIKE');
+    public function notLike($field, $mappedKey=null, $condition = 'AND')
+    {
+        return $this->_add($field, $mappedKey, $condition, 'NOT LIKE');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @return Where
      */
-    public function orNotLike(
-        $field,
-        $value = false
-    ) {
-        return $this->notLike($field, $value, 'OR');
+    public function orNotLike($field, $mappedKey=null)
+    {
+        return $this->notLike($field, $mappedKey, 'OR');
     }
 
     /**
      * @param string $field
-     * @param bool $value
+     * @param string $mappedKey
      * @param string $condition
      * @param string $operator
      * @return $this
      */
-    protected function _add(
-        $field,
-        $value = false,
-        $condition = 'AND',
-        $operator = '='
-    ) {
-        if (strlen($this->where)) {
-            $this->where = ' ' . $condition . ' ';
+    protected function _add($field, $mappedKey=null, $condition = 'AND', $operator = '=')
+    {
+        if($mappedKey) {
+            $this->query->getParser()->addMapping($field, $mappedKey);
         }
-        $this->where .= $this->_buildWhereElement($field, $value, $condition, $operator);
-        return $this;
-    }
 
-    /**
-     * @param string $fieldName
-     * @param mixed  $value
-     * @param string $condition
-     * @param string $operator
-     * @return string
-     */
-    protected function _buildWhereElement(
-        $fieldName,
-        $value,
-        $condition,
-        $operator
-    ) {
-        $element   = $fieldName . ' ' . $operator . ' ';
-        $fieldType = $this->query->tableDefinition->getTypeOf($fieldName);
+        if (strlen($this->where)) {
+            $this->where .= ' ' . $condition . ' ';
+        }
+
+        $this->where .= $field . ' ' . $operator . ' ';
         switch ($operator) {
             case 'IN'     :
             case 'NOT IN' :
-                $element .= implode(',', $this->query->pdo->quoteArray($value, $fieldType));
+                $this->where .= '(:implode|,:'.($mappedKey ? $mappedKey : $field).')';
                 break;
             default:
-                if (is_array($value)) {
-                    $element .= implode(
-                        ' ' . $condition . ' ' . $element,
-                        $this->query->pdo->quoteArray($value, $fieldType)
-                    );
-                }
-                else if (false === $value) {
-                    $element .= ':'.$fieldName;
-                }
-                else if (null !== $value) {
-                    $element .= $this->query->pdo->quote($value, $fieldType);
-                }
-
+                $this->where .= ':implode| '.$condition.' :'.($mappedKey ? $mappedKey : $field);
                 break;
         }
-        return $element;
+        return $this;
     }
 }
