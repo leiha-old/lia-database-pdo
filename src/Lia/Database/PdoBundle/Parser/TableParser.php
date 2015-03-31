@@ -42,7 +42,7 @@ class TableParser
      */
     public function getPattern()
     {
-        $pattern = '([a-zA-Z_]{1}[a-zA-Z_0-9]*)';
+        $pattern = '(?::(.[^|]+)(?:\|(.+)|):|)([a-zA-Z_]{1}[a-zA-Z_0-9]*)';
         if($this->tableAlias) {
             $pattern = $this->tableAlias.'\.'.$pattern;
         }
@@ -61,10 +61,27 @@ class TableParser
 
         $parser = $this;
         return function ($match) use ($parser, $params) {
-            return isset($params[$match[1]])
-                ? $parser->quote($match[1], $params[$match[1]])
-                : $match[0]
-                ;
+            if(isset($params[$match[3]])) {
+                $fieldName = isset($parser->mapping[$match[3]])
+                    ? $parser->mapping[$match[3]]
+                    : $match[3]
+                    ;
+
+                if(is_array($params[$match[3]])) {
+                    switch($match[1]){
+                        case 'implode' :
+                            return implode(
+                                $match[2],
+                                $parser->quoteArray($params[$match[3]], $fieldName)
+                            );
+                            break;
+                    }
+                } else {
+                   return $parser->quote($fieldName, $params[$match[3]]);
+                }
+            } else {
+                return $match[0];
+            }
         };
     }
 
@@ -98,11 +115,12 @@ class TableParser
 
     /**
      * @param array $values
+     * @param string $fieldName
      * @return array
      */
-    public function quoteArray(array $values)
+    public function quoteArray(array $values, $fieldName='')
     {
-        return $this->tableDefinition->quoteArray($values);
+        return $this->tableDefinition->quoteArray($values, $fieldName);
     }
 
     /**

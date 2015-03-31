@@ -10,7 +10,7 @@ class Factory
 {
     public function getConnection()
     {
-        $pdo = new Pdo($this->getService('doctrine.dbal.connection'));
+        $pdo = new Pdo($this->getService('doctrine.dbal.default_connection'));
         $pdo->setContainer($this->container);
         return $pdo;
     }

@@ -10,7 +10,7 @@ class SimpleParser
      */
     public function getPattern()
     {
-        return ':([a-zA-Z_]{1}[a-zA-Z_0-9]*)';
+        return ':(?::(.[^|]+)(?:\|(.+)|):|)([a-zA-Z_]{1}[a-zA-Z_0-9]*)';
     }
 
     /**
@@ -25,10 +25,22 @@ class SimpleParser
 
         $parser = $this;
         return function ($match) use ($parser, $params) {
-            return isset($params[$match[1]])
-                ? $parser->quote($params[$match[1]][0], $params[$match[1]][1])
-                : $match[0]
-                ;
+            if(isset($params[$match[3]])) {
+                if(is_array($params[$match[3]])) {
+                    switch($match[1]){
+                        case 'implode' :
+                            return implode(
+                                $match[2],
+                                $parser->quoteArray($params[$match[3]][0], $params[$match[3]][1])
+                            );
+                            break;
+                    }
+                } else {
+                    return $parser->quote($params[$match[3]][0], $params[$match[3]][1]);
+                }
+            } else {
+                return $match[0];
+            }
         };
     }
 

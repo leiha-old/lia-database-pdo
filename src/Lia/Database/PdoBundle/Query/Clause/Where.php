@@ -280,6 +280,8 @@ class Where
     {
         if($mappedKey) {
             $this->query->getParser()->addMapping($field, $mappedKey);
+        } else {
+            $mappedKey = $field;
         }
 
         if (strlen($this->where)) {
@@ -290,10 +292,12 @@ class Where
         switch ($operator) {
             case 'IN'     :
             case 'NOT IN' :
-                $this->where .= '(:implode|,:'.($mappedKey ? $mappedKey : $field).')';
+                $this->where .= '(::implode|,:'.$mappedKey.')';
                 break;
             default:
-                $this->where .= ':implode| '.$condition.' :'.($mappedKey ? $mappedKey : $field);
+                $this->where .= '::implode| OR '.$field . ' ' . $operator . ' :'
+                    .$mappedKey
+                ;
                 break;
         }
         return $this;

@@ -164,9 +164,9 @@ class Update
         $set = array();
         foreach ($this->setArray as $a => $b) {
             if(is_int($a)) {
-                $set[] = $a.'= '.$a;
+                $set[] = $b.'= :'.$b;
             } else {
-                $set[] = $a.'= '.$b;
+                $set[] = $a.'= :'.$b;
                 $this->parser->addMapping($a, $b);
             }
         }

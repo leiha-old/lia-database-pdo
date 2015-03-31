@@ -95,13 +95,20 @@ class TableDefinition
 
     /**
      * @param array $values
+     * @param string $fieldName
      * @return array
      */
-    public function quoteArray(array $values)
+    public function quoteArray(array $values, $fieldName='')
     {
         $quoted = array();
-        foreach ($values as $fieldName => $value) {
-            $quoted[$fieldName] = $this->quote($value, $fieldName);
+        if(!$fieldName) {
+            foreach ($values as $fieldName => $value) {
+                $quoted[$fieldName] = $this->quote($fieldName, $value);
+            }
+        } else {
+            foreach ($values as $value) {
+                $quoted[] = $this->quote($fieldName, $value);
+            }
         }
         return $quoted;
     }
